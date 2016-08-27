@@ -58,15 +58,14 @@ impl Backend {
                                                state == glutin::ElementState::Pressed)
                 }
                 glutin::Event::ReceivedCharacter(c) => context.input_char(c),
-                glutin::Event::KeyboardInput(s, scancode, Some(vk)) => {
-                    let is_down = s == glutin::ElementState::Pressed;
+                glutin::Event::KeyboardInput(state, scancode, Some(vk)) => {
+                    self.keypress.push(KeyEvent {
+                        state: state,
+                        key_code: vk,
+                        scancode: scancode,
+                    });
 
-                    if is_down {
-                        self.keypress.push(KeyEvent {
-                            key_code: vk,
-                            scancode: scancode,
-                        });
-                    }
+                    let is_down = state == glutin::ElementState::Pressed;
 
                     use glium::glutin::VirtualKeyCode::*;
                     if let Some(vk) = match vk {
@@ -160,7 +159,11 @@ impl Backend {
 
 /// Type for key events not handled by Vitral.
 pub struct KeyEvent {
+    /// Was the key pressed or released
+    pub state: glutin::ElementState,
+    /// Layout-dependent keycode
     pub key_code: glutin::VirtualKeyCode,
+    /// Keyboard layout independent hardware scancode for the key
     pub scancode: u8,
 }
 
