@@ -12,3 +12,7 @@ glium = "0.15"
 
 [dependencies.vitral]
 git = "https://github.com/rsaarelm/vitral"
+
+[dev-dependencies]
+euclid = "0.10"
+image = "0.10"
