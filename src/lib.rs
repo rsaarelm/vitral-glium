@@ -13,21 +13,28 @@ use glium::index::PrimitiveType;
 pub type GliumTexture = glium::texture::SrgbTexture2d;
 
 /// Glium-rendering backend for Vitral.
-pub struct Backend {
+pub struct Backend<V> {
     program: glium::Program,
     textures: Vec<GliumTexture>,
 
     keypress: Vec<KeyEvent>,
+
+    phantom: ::std::marker::PhantomData<V>,
 }
 
-impl Backend {
+impl<V: vitral::Vertex + glium::Vertex> Backend<V> {
     /// Create a new Glium backend for Vitral.
-    pub fn new(program: glium::Program) -> Backend {
+    ///
+    /// The backend requires an user-supplied vertex type as a type parameter and a shader program
+    /// to render data of that type as argument to the constructor.
+    pub fn new(program: glium::Program) -> Backend<V> {
         Backend {
             program: program,
             textures: Vec::new(),
 
             keypress: Vec::new(),
+
+            phantom: ::std::marker::PhantomData,
         }
     }
 
@@ -40,10 +47,10 @@ impl Backend {
         self.textures.len() - 1
     }
 
-    fn process_events<V: vitral::Vertex>(&mut self,
-                                         display: &glium::Display,
-                                         context: &mut vitral::Context<usize, V>)
-                                         -> bool {
+    fn process_events(&mut self,
+                      display: &glium::Display,
+                      context: &mut vitral::Context<usize, V>)
+                      -> bool {
         self.keypress.clear();
 
         // polling and handling the events received by the window
@@ -103,12 +110,10 @@ impl Backend {
     }
 
     /// Render the draw instructions from the Vitral context and read input.
-    pub fn update<V>(&mut self,
-                     display: &glium::Display,
-                     context: &mut vitral::Context<usize, V>)
-                     -> bool
-        where V: vitral::Vertex + glium::Vertex
-    {
+    pub fn update(&mut self,
+                  display: &glium::Display,
+                  context: &mut vitral::Context<usize, V>)
+                  -> bool {
         let mut target = display.draw();
         target.clear_color(0.0, 0.0, 0.0, 0.0);
         let (w, h) = target.get_dimensions();
