@@ -1,3 +1,7 @@
+//! Glium-based backend for the Vitral GUI library
+
+#![deny(missing_docs)]
+
 #[macro_use]
 extern crate glium;
 extern crate vitral;
@@ -5,8 +9,10 @@ extern crate vitral;
 use glium::{Surface, glutin};
 use glium::index::PrimitiveType;
 
+/// Default texture type used by the backend.
 pub type GliumTexture = glium::texture::SrgbTexture2d;
 
+/// Glium-rendering backend for Vitral.
 pub struct Backend {
     program: glium::Program,
     textures: Vec<GliumTexture>,
@@ -96,6 +102,7 @@ impl Backend {
         self.keypress.pop()
     }
 
+    /// Render the draw instructions from the Vitral context and read input.
     pub fn update<V>(&mut self,
                      display: &glium::Display,
                      context: &mut vitral::Context<usize, V>)
@@ -167,7 +174,7 @@ pub struct KeyEvent {
     pub scancode: u8,
 }
 
-/// Create a shader program for the DefaultVertex type.
+/// Create a shader program for the `DefaultVertex` type.
 pub fn default_program(display: &glium::Display)
                        -> Result<glium::Program, glium::program::ProgramChooserCreationError> {
     program!(
@@ -214,8 +221,11 @@ pub fn default_program(display: &glium::Display)
 /// A regular vertex that implements exactly the fields used by Vitral.
 #[derive(Copy, Clone)]
 pub struct DefaultVertex {
+    /// 2D position
     pub pos: [f32; 2],
+    /// RGBA color
     pub color: [f32; 4],
+    /// Texture coordinates
     pub tex_coord: [f32; 2],
 }
 implement_vertex!(DefaultVertex, pos, color, tex_coord);
